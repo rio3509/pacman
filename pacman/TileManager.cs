@@ -84,7 +84,7 @@ namespace pacman
             int rows = mapArray.GetLength(0);
             int cols = mapArray.GetLength(1);
             Tile[,] tileArray = new Tile[rows, cols];
-            Microsoft.Xna.Framework.Color tileColour = Microsoft.Xna.Framework.Color.White;
+            Microsoft.Xna.Framework.Color tileColour = Microsoft.Xna.Framework.Color.Green;
 
             for (int y = 0; y < rows; y++)
             {   
@@ -120,11 +120,11 @@ namespace pacman
                             tileArray[y, x] = new Tile(textures[7], tilePosition, tileColour, "BR");
                             break;
                         case '8':
-                            tileArray[y, x] = new Tile(textures[9], tilePosition, tileColour, "Empty");
+                            tileArray[y, x] = new Tile(textures[8], tilePosition, tileColour, "Empty");
                             break;
                         default:
                             // Fallback to a safe default to avoid nulls if the map contains unexpected chars or missing data
-                            tileArray[y, x] = new Tile(textures[8], tilePosition, tileColour, "Solid");
+                            tileArray[y, x] = new Tile(textures[9], tilePosition, tileColour, "Solid");
                             break;
                     }
                 }
