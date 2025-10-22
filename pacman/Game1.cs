@@ -17,8 +17,9 @@ namespace pacman
         private List<Texture2D> _allFileTextures = new List<Texture2D>();
 
         private Vector2 testSpeed = new Vector2(5.0f, 5.0f);
+        private Vector2 TestPos;
+        private Texture2D TestTex;
         private Player _pacman;
-
 
         public Game1()
         {
@@ -53,9 +54,9 @@ namespace pacman
             _tileValuesArray = TileManager.FileReader("MazeMap.txt", SCREEN_TILES_WIDE, SCREEN_TILES_HIGH);
             _tileArray = TileManager.CreateMap(_tileValuesArray, _tileSizeX, _tileSizeY, _allFileTextures);
 
-            Texture2D TestTex = Content.Load<Texture2D>("circle");
-            Vector2 TestPos = new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
-            _pacman = new Player(TestTex, TestPos, Color.Blue);
+            TestPos = new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
+            TestTex = Content.Load<Texture2D>("pacman");
+            _pacman = new Player(TestTex, TestPos, Color.White);
         }
 
         protected override void Update(GameTime gameTime)
@@ -71,7 +72,7 @@ namespace pacman
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.White);
             _spriteBatch.Begin();
             // TODO: Add your drawing code here
             foreach (Tile t in _tileArray)

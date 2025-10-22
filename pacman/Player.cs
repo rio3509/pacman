@@ -38,29 +38,45 @@ namespace pacman
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Up))
             {
-                _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X, _spritePos.Y - velocity.Y);
+                if (_spritePos.Y > 0)
+                {
+                    _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X, _spritePos.Y - velocity.Y);
+                }
+                
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
             {
-                _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X, _spritePos.Y + velocity.Y);
+                if (_spritePos.Y < (1400 - _spriteTex.Height))
+                {
+                    _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X, _spritePos.Y + velocity.Y);
+                }
+
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
-                _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X - velocity.X, _spritePos.Y);
+                if (_spritePos.X > 0)
+                {
+                    _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X - velocity.X, _spritePos.Y);
+                }
+
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
             {
-                _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X + velocity.X, _spritePos.Y);
+                if (_spritePos.X < (1000 - _spriteTex.Width))
+                {
+                    _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X + velocity.X, _spritePos.Y);
+                }
+
             }
 
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_spriteTex, _spritePos, new Rectangle(), _spriteCol);
+            spriteBatch.Draw(_spriteTex, _spritePos, _spriteCol);
         }
     }
 }

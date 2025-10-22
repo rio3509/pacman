@@ -84,7 +84,7 @@ namespace pacman
             int rows = mapArray.GetLength(0);
             int cols = mapArray.GetLength(1);
             Tile[,] tileArray = new Tile[rows, cols];
-            Microsoft.Xna.Framework.Color tileColour = Microsoft.Xna.Framework.Color.Green;
+            Microsoft.Xna.Framework.Color tileColour = Microsoft.Xna.Framework.Color.LightBlue;
 
             for (int y = 0; y < rows; y++)
             {   
