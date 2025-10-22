@@ -16,6 +16,10 @@ namespace pacman
         private Tile[,] _tileArray;
         private List<Texture2D> _allFileTextures = new List<Texture2D>();
 
+        private Vector2 testSpeed = new Vector2(5.0f, 5.0f);
+        private Player _pacman;
+
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -48,6 +52,10 @@ namespace pacman
 
             _tileValuesArray = TileManager.FileReader("MazeMap.txt", SCREEN_TILES_WIDE, SCREEN_TILES_HIGH);
             _tileArray = TileManager.CreateMap(_tileValuesArray, _tileSizeX, _tileSizeY, _allFileTextures);
+
+            Texture2D TestTex = Content.Load<Texture2D>("circle");
+            Vector2 TestPos = new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
+            _pacman = new Player(TestTex, TestPos, Color.Blue);
         }
 
         protected override void Update(GameTime gameTime)
@@ -56,6 +64,7 @@ namespace pacman
                 Exit();
 
             // TODO: Add your update logic here
+            _pacman.Movement(testSpeed);
 
             base.Update(gameTime);
         }
@@ -69,6 +78,9 @@ namespace pacman
             {
                 t.DrawTile(_spriteBatch);
             }
+
+            _pacman.Draw(_spriteBatch);
+
             _spriteBatch.End();
 
             base.Draw(gameTime);
