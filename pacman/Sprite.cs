@@ -8,24 +8,28 @@ using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+//using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+//using System.Collections.Generic;
 
 namespace pacman
 {
     internal class Sprite
     {
         Texture2D _spriteTex;
-        Vector2 _spritePos;
+        Microsoft.Xna.Framework.Vector2 _spritePos;
         Microsoft.Xna.Framework.Color _spriteCol;
-        Rectangle _spriteBox;
+        Microsoft.Xna.Framework.Rectangle _spriteBox;
         public Sprite()
         { }
 
-        public Sprite(Texture2D texture, Vector2 position, Microsoft.Xna.Framework.Color color)
+        public Sprite(Texture2D texture, Microsoft.Xna.Framework.Vector2 position, Microsoft.Xna.Framework.Color color)
         {
             _spriteTex = texture;
             _spritePos = position;
             _spriteCol = color;
-            _spriteBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
+            _spriteBox = new Microsoft.Xna.Framework.Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
         }
 
         public Texture2D Texture
@@ -34,7 +38,7 @@ namespace pacman
             set { _spriteTex = value; }
         }
 
-        public Vector2 Position
+        public Microsoft.Xna.Framework.Vector2 Position
         { 
             get { return _spritePos; }
             set { _spritePos = value; } 
@@ -46,10 +50,15 @@ namespace pacman
             set { _spriteCol = value; }
         }
 
-        public Rectangle BoundingBox
+        public Microsoft.Xna.Framework.Rectangle BoundingBox
         {
             get { return _spriteBox; }
             set { _spriteBox = value; }
+        }
+
+        public virtual void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(_spriteTex, _spritePos, _spriteCol);
         }
     }
 }

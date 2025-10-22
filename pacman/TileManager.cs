@@ -120,11 +120,11 @@ namespace pacman
                             tileArray[y, x] = new Tile(textures[7], tilePosition, tileColour, "BR");
                             break;
                         case '8':
-                            tileArray[y, x] = new Tile(textures[9], tilePosition, tileColour, "Empty");
+                            tileArray[y, x] = new Tile(textures[8], tilePosition, tileColour, "Empty");
                             break;
                         default:
                             // Fallback to a safe default to avoid nulls if the map contains unexpected chars or missing data
-                            tileArray[y, x] = new Tile(textures[8], tilePosition, tileColour, "Solid");
+                            tileArray[y, x] = new Tile(textures[9], tilePosition, tileColour, "Solid");
                             break;
                     }
                 }
