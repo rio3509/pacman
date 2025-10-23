@@ -65,7 +65,7 @@ namespace pacman
                 Exit();
 
             // TODO: Add your update logic here
-            _pacman.Movement(testSpeed);
+            _pacman.Movement(testSpeed, _tileArray);
 
             base.Update(gameTime);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
@@ -14,7 +15,7 @@ namespace pacman
         private Color _tileColor;
         private Texture2D _tileTexture;
         private string _tileType;
-
+        private Rectangle _tileBox;
         public Tile()
         { }
 
@@ -24,6 +25,7 @@ namespace pacman
             _tileColor = color;
             _tileTexture = texture;
             _tileType = type;
+            _tileBox = new Microsoft.Xna.Framework.Rectangle((int)_tilePos.X, (int)_tilePos.Y, _tileTexture.Width, _tileTexture.Height);
         }
 
         public Texture2D Texture
@@ -49,6 +51,12 @@ namespace pacman
         {
             get { return _tileColor; }
             set { _tileColor = value; }
+        }
+
+        public Rectangle TileBox
+        {
+            get { return _tileBox; }
+            set { _tileBox = value; }
         }
 
         public void DrawTile(SpriteBatch spriteBatch)
