@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+//using SharpDX.Direct2D1;
 using System.Collections.Generic;
 
 namespace pacman
@@ -16,10 +17,24 @@ namespace pacman
         private Tile[,] _tileArray;
         private List<Texture2D> _allFileTextures = new List<Texture2D>();
 
-        private Vector2 testSpeed = new Vector2(5.0f, 5.0f);
-        private Vector2 TestPos;
-        private Texture2D TestTex;
+        private Texture2D _playerTexture;
         private Player _pacman;
+
+        //iterate through tile array to finr the first empty tile
+        private Point FindFirstEmptyTile()
+        {
+            for (int y = 0; y < _tileArray.GetLength(0); y++)
+            {
+                for (int x = 0; x < _tileArray.GetLength(1); x++)
+                {
+                    if (_tileArray[y, x].Type == "Empty")
+                    {
+                        return new Point(x, y);
+                    }
+                }
+            }
+            return new Point(0, 0);
+        }
 
         public Game1()
         {
@@ -35,8 +50,6 @@ namespace pacman
         {
             // TODO: Add your initialization logic here
 
-            //_tileValuesArray = TileManager.FileReader("MazeMap.txt", SCREEN_TILES_HIGH, SCREEN_TILES_WIDE);
-            //int testInt = 1 + 1;
 
             base.Initialize();
         }
@@ -54,9 +67,11 @@ namespace pacman
             _tileValuesArray = TileManager.FileReader("MazeMap.txt", SCREEN_TILES_WIDE, SCREEN_TILES_HIGH);
             _tileArray = TileManager.CreateMap(_tileValuesArray, _tileSizeX, _tileSizeY, _allFileTextures);
 
-            TestPos = new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
-            TestTex = Content.Load<Texture2D>("pacman");
-            _pacman = new Player(TestTex, TestPos, Color.White);
+            _playerTexture = Content.Load<Texture2D>("pacman");
+            Point startPosition = FindFirstEmptyTile();
+
+            _pacman = new Player(_playerTexture, new Vector2(startPosition.X * _tileSizeX, startPosition.Y * _tileSizeY), Color.White);
+            _pacman.HomeOnGrid(startPosition, _tileSizeX, _tileSizeY);
         }
 
         protected override void Update(GameTime gameTime)
@@ -65,7 +80,7 @@ namespace pacman
                 Exit();
 
             // TODO: Add your update logic here
-            _pacman.Movement(testSpeed, _tileArray);
+            _pacman.Update(gameTime, _tileArray);
 
             base.Update(gameTime);
         }

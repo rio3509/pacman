@@ -5,139 +5,127 @@ using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-//using System.Windows.Forms;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
-using System.Windows.Forms.VisualStyles;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 
 namespace pacman
 {
-    //create player class inheriting from sprites
     internal class Player : Sprite
     {
-        //re-declare variables
-        Texture2D _spriteTex;
-        Microsoft.Xna.Framework.Vector2 _spritePos;
-        Color _spriteCol;
-        Rectangle _spriteBox;
-        KeyboardState _prevBoard;
+        //declare variables
+        Texture2D _PspriteTex;
+        Microsoft.Xna.Framework.Vector2 _PspritePos;
+        Color _PspriteCol;
+        Rectangle _PspriteBox;
         private Point _grid;
-
-        //allow for an empty instance to be created (constructor)
+        private int _tileWidth;
+        private int _tileHeight;
+        private KeyboardState _prevBoard;
         public Player()
         { }
 
-        //define method to create a player
         public Player(Texture2D texture, Microsoft.Xna.Framework.Vector2 position, Microsoft.Xna.Framework.Color color)
             :base (texture, position, color)
         {
-            _spriteTex = texture;
-            _spritePos = position;
-            _spriteCol = color;
-            _spriteBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
+            _PspriteTex = texture;
+            _PspritePos = position;
+            _PspriteCol = color;
+            _PspriteBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
         }
 
-        //define movement method
-        public void Movement(Microsoft.Xna.Framework.Vector2 velocity, Tile[,] tileMap)
+        //set player location to a particular tile ("home" tile)
+        public void HomeOnGrid(Point grid, int tileWidth, int tileHeight)
         {
-            Point _delta = Point.Zero;
+            _grid = grid;
+            _tileWidth = tileWidth;
+            _tileHeight = tileHeight;
+
+            //convert grid location ("home" location) to pixel location
+            _PspritePos = new Vector2(_grid.X * _tileWidth, _grid.Y * _tileHeight);
+
+            //set bounding box to home too
+            _PspriteBox = new Rectangle((int)_PspritePos.X, (int)_PspritePos.Y, _PspriteTex.Width, _PspriteTex.Height);
+        }
+
+        //method to check if a key has been pressed (will only return true when the key is released)
+        private bool WasKeyPressed(KeyboardState current, Keys key)
+        {
+            if (current.IsKeyDown(key) && !_prevBoard.IsKeyDown(key))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        //passable or not method
+        private bool IsPassable(Point target, Tile[,] tiles)
+        {
+            if (target.Y < 0 || target.Y >= tiles.GetLength(0) || target.X < 0 || target.X >= tiles.GetLength(1))
+            {
+                return false;
+            }
+            else
+            {
+                return (tiles[target.Y, target.X].Type == "Empty");
+            }
+
+        }
+
+        //movement method
+        public void Update(GameTime gameTime, Tile[,] tiles)
+        {
             KeyboardState currentBoard = Keyboard.GetState();
 
-            if (WasKeyPressed(_prevBoard, Keys.Up))
+            Point delta = Point.Zero;
+
+            if (WasKeyPressed(currentBoard, Keys.Up))
             {
-                _delta = new Point(0, -1);
-                //if (IsTileWalkable(tileMap, _delta, _spritePos, _spriteTex))
-                //{
-                //    //_spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X, _spritePos.Y - velocity.Y);
-                //    _delta = new Point();
-                //}
-                
+                delta = new Point(0, -1);
+                _PspriteCol = Color.Red;
             }
 
-            if (WasKeyPressed(_prevBoard, Keys.Down))
+            else if (WasKeyPressed(currentBoard, Keys.Down))
             {
-                _delta = new Point(0, 1);
-                //if (_spritePos.Y < (1400 - _spriteTex.Height))
-                //{
-                //    _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X, _spritePos.Y + velocity.Y);
-                //}
-
+                delta = new Point(0, 1);
+                _PspriteCol = Color.Red;
             }
 
-            if (WasKeyPressed(_prevBoard, Keys.Left))
+            else if (WasKeyPressed(currentBoard, Keys.Left))
             {
-                _delta = new Point(-1, 0);
-                //if (_spritePos.X > 0)
-                //{
-                //    _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X - velocity.X, _spritePos.Y);
-                //}
-
+                delta = new Point(-1, 0);
             }
 
-            if (WasKeyPressed(_prevBoard, Keys.Right))
+            else if (WasKeyPressed(currentBoard, Keys.Right))
             {
-                _delta = new Point(1, 0);
-                //if (_spritePos.X < (1000 - _spriteTex.Width))
-                //{
-                //    _spritePos = new Microsoft.Xna.Framework.Vector2(_spritePos.X + velocity.X, _spritePos.Y);
-                //}
-
+                delta = new Point(1, 0);
             }
 
-            Point _target = new Point(_grid.X + _delta.X, _grid.Y + _delta.Y);
-            
-            if (IsTileWalkable(tileMap, _target))
+            if (delta != Point.Zero)
             {
-                //if tile is walkable, update position and collision box (done when drawing)
-                _grid = _target;
-                _spritePos = new Microsoft.Xna.Framework.Vector2(_grid.X * _spriteTex.Width, _grid.Y * _spriteTex.Height);
+                //set target to tile that will be moved to, and check if it's walkable
+                Point target = new Point(_grid.X + delta.X, _grid.Y + delta.Y);
+
+                if (IsPassable(target, tiles))
+                {
+                    //update grid/position/bounding box
+                    _grid = target;
+                    _PspritePos = new Vector2(_grid.X * _tileWidth, _grid.Y * _tileHeight);
+                    _PspriteBox = new Rectangle((int)_PspritePos.X, (int)_PspritePos.Y, _PspriteTex.Width, _PspriteTex.Height);
+
+                }
             }
 
             _prevBoard = currentBoard;
         }
 
-        //define a method to check if a key has been held down
-        private bool WasKeyPressed(KeyboardState current, Keys key)
-        {
-            //if the currently held down key and previously held down key match, return true
-            if (current.IsKeyDown(key) && !_prevBoard.IsKeyDown(key))
-            {
-                return true;
-            }
-            //else false
-            else
-            {
-                return false;
-            }
-        }
-
-        //create a function to check if a given tile is walkable
-        private bool IsTileWalkable(Tile[,] tileMap, Point target)
-        {
-            //if the position of the given tile is outside of bounds, then it is not walkable
-            if (_spritePos.X >= (tileMap.GetLength(1)) || (_spritePos.X < 0) || (_spritePos.Y >= tileMap.GetLength(0)) || (_spritePos.Y < 0))
-            {
-                return false;
-            }
-            else
-            {
-                //if a given tile is "Empty" then return true
-                return (tileMap[target.Y, target.X].Type == "Empty");
-            }
-        }
-
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_spriteTex, _spritePos, _spriteCol);
-            _spriteBox.X = (int)_spritePos.X;
-            _spriteBox.Y = (int)_spritePos.Y;
+            spriteBatch.Draw(_PspriteTex, _PspritePos, _PspriteCol);
         }
     }
 }
