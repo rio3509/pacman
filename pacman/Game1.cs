@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 //using SharpDX.Direct2D1;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
+//using System.Drawing;
+//using System.Drawing.Text;
 
 namespace pacman
 {
@@ -16,11 +19,15 @@ namespace pacman
         private char[,] _tileValuesArray;
         private Tile[,] _tileArray;
         private List<Texture2D> _allFileTextures = new List<Texture2D>();
+        private List<Pill> _allPills = new List<Pill>();
 
         private Texture2D _playerTexture;
+        private Texture2D _pillTex;
         private Player _pacman;
+        private Pill _tempPill;
+        private Color _pillColor = Color.Black;
 
-        //iterate through tile array to finr the first empty tile
+        //iterate through tile array to find the first empty tile
         private Point FindFirstEmptyTile()
         {
             for (int y = 0; y < _tileArray.GetLength(0); y++)
@@ -35,6 +42,7 @@ namespace pacman
             }
             return new Point(0, 0);
         }
+
 
         public Game1()
         {
@@ -68,12 +76,32 @@ namespace pacman
             _tileArray = TileManager.CreateMap(_tileValuesArray, _tileSizeX, _tileSizeY, _allFileTextures);
 
             _playerTexture = Content.Load<Texture2D>("pacman");
-            Point startPosition = FindFirstEmptyTile();
+            Microsoft.Xna.Framework.Point startPosition = FindFirstEmptyTile();
 
             _pacman = new Player(_playerTexture, new Vector2(startPosition.X * _tileSizeX, startPosition.Y * _tileSizeY), Color.White);
-            _pacman.HomeOnGrid(startPosition, _tileSizeX, _tileSizeY);
+            _pacman.HomeOnGrid(startPosition, _tileSizeX, _tileSizeY, _tileArray);
+
+            //iterate through tile array to find the position of every empty tile
+
+            _pillTex = Content.Load<Texture2D>("Pill");
+
+            foreach (Tile tile in _tileArray)
+            {
+                //if the tile type is "empty" then create a new pill in a list with that tile's position
+                if (tile.Type == "Empty")
+                {
+                    _tempPill = new Pill(_pillTex, _pillColor, tile.Position);
+                    _allPills.Add(_tempPill);
+                }
+            }
+
         }
 
+        private Tile[,] RenewTileMap(Tile[,] tileMap)
+        {
+            Tile[,] newMap = tileMap;
+            return newMap;
+        }
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -81,6 +109,15 @@ namespace pacman
 
             // TODO: Add your update logic here
             _pacman.Update(gameTime, _tileArray);
+
+            //check collision between each pill and the player
+            foreach (Pill test in _allPills)
+            {
+                if (_pacman.BoundingBox.Intersects(test.BoundingBox))
+                {
+                    test.Visible = false;
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -93,6 +130,11 @@ namespace pacman
             foreach (Tile t in _tileArray)
             {
                 t.DrawTile(_spriteBatch);
+            }
+
+            foreach (Pill p in _allPills)
+            {
+                p.DrawPill(_spriteBatch);
             }
 
             _pacman.Draw(_spriteBatch);

@@ -62,6 +62,7 @@ namespace pacman
             bottomRight = content.Load<Texture2D>("Wall BR");
             empty = content.Load<Texture2D>("Empty");
             solid = content.Load<Texture2D>("Solid");
+            //bigPill = content.Load<Texture2D>("Big Pill");
 
             TextureList.Add(topLeft);
             TextureList.Add(top);
@@ -73,6 +74,7 @@ namespace pacman
             TextureList.Add(bottomRight);
             TextureList.Add(empty);
             TextureList.Add(solid);
+            //TextureList.Add(bigPill);
 
             return TextureList;
         }
@@ -121,6 +123,10 @@ namespace pacman
                             break;
                         case '8':
                             tileArray[y, x] = new Tile(textures[8], tilePosition, tileColour, "Empty");
+                            break;
+                        case 'A':
+                            //draw an empty tile but set the type to "Pill_L"
+                            tileArray[y, x] = new Tile(textures[8], tilePosition, tileColour, "Pill_L");
                             break;
                         default:
                             // Fallback to a safe default to avoid nulls if the map contains unexpected chars or missing data

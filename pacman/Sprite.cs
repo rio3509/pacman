@@ -50,7 +50,7 @@ namespace pacman
             set { _spriteCol = value; }
         }
 
-        public Microsoft.Xna.Framework.Rectangle BoundingBox
+        public virtual Microsoft.Xna.Framework.Rectangle BoundingBox
         {
             get { return _spriteBox; }
             set { _spriteBox = value; }

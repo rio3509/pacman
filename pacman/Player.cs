@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Drawing.Text;
 
 namespace pacman
 {
@@ -23,6 +24,7 @@ namespace pacman
         private int _tileWidth;
         private int _tileHeight;
         private KeyboardState _prevBoard;
+        private Tile[,] _privateTiles;
         public Player()
         { }
 
@@ -36,8 +38,9 @@ namespace pacman
         }
 
         //set player location to a particular tile ("home" tile)
-        public void HomeOnGrid(Point grid, int tileWidth, int tileHeight)
+        public void HomeOnGrid(Point grid, int tileWidth, int tileHeight, Tile[,] tiles)
         {
+            _privateTiles = tiles;
             _grid = grid;
             _tileWidth = tileWidth;
             _tileHeight = tileHeight;
@@ -63,22 +66,33 @@ namespace pacman
         }
 
         //passable or not method
-        private bool IsPassable(Point target, Tile[,] tiles)
+        private string IsPassable(Point target, Tile[,] tiles)
         {
             if (target.Y < 0 || target.Y >= tiles.GetLength(0) || target.X < 0 || target.X >= tiles.GetLength(1))
             {
-                return false;
+                return "false";
+            }
+            else if (tiles[target.Y, target.X].Type == "Empty")
+            {
+                return "true";
+            }
+            else if (tiles[target.Y, target.X].Type == "Pill_L")
+            {
+                _privateTiles[target.Y, target.X].Type = "Empty";
+                return "true";
             }
             else
             {
-                return (tiles[target.Y, target.X].Type == "Empty");
+                return "false";
             }
 
         }
 
+
         //movement method
         public void Update(GameTime gameTime, Tile[,] tiles)
         {
+            //_privateTiles = tiles;
             KeyboardState currentBoard = Keyboard.GetState();
 
             Point delta = Point.Zero;
@@ -86,13 +100,13 @@ namespace pacman
             if (WasKeyPressed(currentBoard, Keys.Up))
             {
                 delta = new Point(0, -1);
-                _PspriteCol = Color.Red;
+                //_PspriteCol = Color.Red;
             }
 
             else if (WasKeyPressed(currentBoard, Keys.Down))
             {
                 delta = new Point(0, 1);
-                _PspriteCol = Color.Red;
+                //_PspriteCol = Color.Red;
             }
 
             else if (WasKeyPressed(currentBoard, Keys.Left))
@@ -110,7 +124,7 @@ namespace pacman
                 //set target to tile that will be moved to, and check if it's walkable
                 Point target = new Point(_grid.X + delta.X, _grid.Y + delta.Y);
 
-                if (IsPassable(target, tiles))
+                if (IsPassable(target, tiles) == "true")
                 {
                     //update grid/position/bounding box
                     _grid = target;
@@ -118,6 +132,15 @@ namespace pacman
                     _PspriteBox = new Rectangle((int)_PspritePos.X, (int)_PspritePos.Y, _PspriteTex.Width, _PspriteTex.Height);
 
                 }
+
+                //if (IsPassable(target, tiles) == "bigPillTrue")
+                //{
+                //    //update grid/position/bounding box
+                //    _grid = target;
+                //    _PspritePos = new Vector2(_grid.X * _tileWidth, _grid.Y * _tileHeight);
+                //    _PspriteBox = new Rectangle((int)_PspritePos.X, (int)_PspritePos.Y, _PspriteTex.Width, _PspriteTex.Height);
+
+                //}
             }
 
             _prevBoard = currentBoard;
@@ -126,6 +149,14 @@ namespace pacman
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(_PspriteTex, _PspritePos, _PspriteCol);
+        }
+
+
+        //test from here
+        public override Rectangle BoundingBox
+        {
+            get { return _PspriteBox; }
+            set { _PspriteBox = value; }
         }
     }
 }
