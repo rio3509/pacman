@@ -25,7 +25,7 @@ namespace pacman
         private Texture2D _pillTex;
         private Player _pacman;
         private Pill _tempPill;
-        private Color _pillColor = Color.Black;
+        private Color _pillColor = Color.White;
 
         //iterate through tile array to find the first empty tile
         private Point FindFirstEmptyTile()
