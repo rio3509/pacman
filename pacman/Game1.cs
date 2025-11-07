@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+
 //using SharpDX.Direct2D1;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
@@ -20,12 +22,20 @@ namespace pacman
         private Tile[,] _tileArray;
         private List<Texture2D> _allFileTextures = new List<Texture2D>();
         private List<Pill> _allPills = new List<Pill>();
+        private List<Pill> _bigPills = new List<Pill>();
 
         private Texture2D _playerTexture;
         private Texture2D _pillTex;
+        private Texture2D _bigPillTex;
+        private Texture2D _ghostTex;
         private Player _pacman;
         private Pill _tempPill;
+        private Ghost _ghost;
         private Color _pillColor = Color.White;
+        private Color _bigPillColor = Color.White;
+
+        private bool _powered = false;
+        private int _timer = 0;
 
         //iterate through tile array to find the first empty tile
         private Point FindFirstEmptyTile()
@@ -41,6 +51,22 @@ namespace pacman
                 }
             }
             return new Point(0, 0);
+        }
+
+        private Point FindRandomTile()
+        {
+            Random random = new Random();
+            int y = random.Next(1, 28);
+            int x = random.Next(1, 20);
+
+            if (_tileArray[y, x].Type == "Empty")
+            {
+                return new Point(x, y);
+            }
+            else
+            {
+                return new Point(5, 5);
+            }
         }
 
 
@@ -95,6 +121,25 @@ namespace pacman
                 }
             }
 
+            //iterate through tile array to find the position of every "Pill_L" tile
+
+            _bigPillTex = Content.Load<Texture2D>("Big Pill");
+
+            foreach (Tile bigpilltile in _tileArray)
+            {
+                //if the tile type is "Pill_L" then create a new pill in a list with that tile's position
+                if (bigpilltile.Type == "Pill_L")
+                {
+                    _tempPill = new Pill(_bigPillTex, _bigPillColor, bigpilltile.Position);
+                    _bigPills.Add(_tempPill);
+                }
+            }
+
+            _ghostTex = Content.Load<Texture2D>("Ghost");
+            Point GhostStart = FindRandomTile();
+
+            _ghost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), Color.White);
+            _ghost.PlaceGhostOnGrid(GhostStart, _tileSizeX, _tileSizeY, _tileArray);
         }
 
         private Tile[,] RenewTileMap(Tile[,] tileMap)
@@ -108,7 +153,14 @@ namespace pacman
                 Exit();
 
             // TODO: Add your update logic here
+            _timer += 1;
             _pacman.Update(gameTime, _tileArray);
+
+            if (_timer == 10)
+            {
+                _ghost.Update(gameTime, _tileArray);
+                _timer = 0;
+            }
 
             //check collision between each pill and the player
             foreach (Pill test in _allPills)
@@ -116,6 +168,15 @@ namespace pacman
                 if (_pacman.BoundingBox.Intersects(test.BoundingBox))
                 {
                     test.Visible = false;
+                }
+            }
+
+            //repeat for every big pill
+            foreach (Pill bigtest in _bigPills)
+            {
+                if (_pacman.BoundingBox.Intersects(bigtest.BoundingBox))
+                {
+                    bigtest.Visible = false;
                 }
             }
 
@@ -137,8 +198,13 @@ namespace pacman
                 p.DrawPill(_spriteBatch);
             }
 
-            _pacman.Draw(_spriteBatch);
+            foreach (Pill a in _bigPills)
+            {
+                a.DrawPill(_spriteBatch);
+            }
 
+            _pacman.Draw(_spriteBatch);
+            _ghost.Draw(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);
