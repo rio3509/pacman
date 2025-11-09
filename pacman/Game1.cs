@@ -6,6 +6,7 @@ using System;
 //using SharpDX.Direct2D1;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
+using System.Runtime.CompilerServices;
 //using System.Drawing;
 //using System.Drawing.Text;
 
@@ -28,14 +29,20 @@ namespace pacman
         private Texture2D _pillTex;
         private Texture2D _bigPillTex;
         private Texture2D _ghostTex;
+        private SpriteFont _scoreFont;
         private Player _pacman;
         private Pill _tempPill;
         private Ghost _ghost;
         private Color _pillColor = Color.White;
         private Color _bigPillColor = Color.White;
+        private Vector2 _scorePos = new Vector2 (25, 5);
 
         private bool _powered = false;
+        private bool _endGame = false;
+        private int _powerTimer = 0;
         private int _timer = 0;
+        private int _score = 0;
+        private string _scoreString;
 
         //iterate through tile array to find the first empty tile
         private Point FindFirstEmptyTile()
@@ -87,12 +94,15 @@ namespace pacman
 
             base.Initialize();
         }
-
+        
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+
+            _scoreFont = Content.Load<SpriteFont>("ScoreFont");
+
             _allFileTextures = TileManager.LoadContent(Content);
 
             int _tileSizeX = _allFileTextures[0].Width;
@@ -156,10 +166,18 @@ namespace pacman
             _timer += 1;
             _pacman.Update(gameTime, _tileArray);
 
+
+            //make ghost movement update every 10 frames to prevent spamming
             if (_timer == 10)
             {
                 _ghost.Update(gameTime, _tileArray);
                 _timer = 0;
+            }
+
+            //check ghost collision with the player
+            if (_ghost.BoundingBox.Intersects(_pacman.BoundingBox))
+            {
+                _endGame = true;
             }
 
             //check collision between each pill and the player
@@ -167,7 +185,12 @@ namespace pacman
             {
                 if (_pacman.BoundingBox.Intersects(test.BoundingBox))
                 {
-                    test.Visible = false;
+                    //if the player collides with a visible pill, update score and make the pill invisible
+                    if (test.Visible == true)
+                    {
+                        test.Visible = false;
+                        _score += 1;
+                    }
                 }
             }
 
@@ -176,11 +199,25 @@ namespace pacman
             {
                 if (_pacman.BoundingBox.Intersects(bigtest.BoundingBox))
                 {
-                    bigtest.Visible = false;
+                    //if the player collides with a visible big pill, update score and make it invisible
+                    if (bigtest.Visible == true)
+                    {
+                        bigtest.Visible = false;
+                        _score += 10;
+                        _powered = true;
+                    }
                 }
             }
 
-            base.Update(gameTime);
+            //update score string
+            _scoreString = "Score: " + _score + "pts";
+
+            //if _endGame is false, continue to use base.Update() (otherwise stop updating to stop score from increasing)
+            if (_endGame == false)
+            {
+                base.Update(gameTime);
+            }
+            //base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -188,23 +225,44 @@ namespace pacman
             GraphicsDevice.Clear(Color.White);
             _spriteBatch.Begin();
             // TODO: Add your drawing code here
-            foreach (Tile t in _tileArray)
+
+            //draw normal game loop as long as _endGame is false
+            if (_endGame == false)
             {
-                t.DrawTile(_spriteBatch);
+                //iterate through tiles to draw them
+                foreach (Tile t in _tileArray)
+                {
+                    t.DrawTile(_spriteBatch);
+                }
+
+                //iterate through pills to draw them
+                foreach (Pill p in _allPills)
+                {
+                    p.DrawPill(_spriteBatch);
+                }
+
+                //iterate through big pills to draw them
+                foreach (Pill a in _bigPills)
+                {
+                    a.DrawPill(_spriteBatch);
+                }
+
+                //draw player
+                _pacman.Draw(_spriteBatch);
+
+                //draw ghost
+                _ghost.Draw(_spriteBatch);
+
+                //draw score last so it's above everything
+                _spriteBatch.DrawString(_scoreFont, _scoreString, _scorePos, Color.Red);
             }
 
-            foreach (Pill p in _allPills)
+            //if _endGame is true then draw end screen
+            if (_endGame == true)
             {
-                p.DrawPill(_spriteBatch);
+                //clear screen + draw black background
+                GraphicsDevice.Clear(Color.Black);
             }
-
-            foreach (Pill a in _bigPills)
-            {
-                a.DrawPill(_spriteBatch);
-            }
-
-            _pacman.Draw(_spriteBatch);
-            _ghost.Draw(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);

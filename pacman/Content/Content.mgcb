@@ -73,6 +73,13 @@
 /processorParam:TextureFormat=Color
 /build:Pill.png
 
+#begin scoreFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:scoreFont.spritefont
+
 #begin Solid.png
 /importer:TextureImporter
 /processor:TextureProcessor
