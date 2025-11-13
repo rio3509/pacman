@@ -24,6 +24,7 @@ namespace pacman
         private List<Texture2D> _allFileTextures = new List<Texture2D>();
         private List<Pill> _allPills = new List<Pill>();
         private List<Pill> _bigPills = new List<Pill>();
+        private List<Ghost> _allGhosts = new List<Ghost>(3);
 
         private Texture2D _playerTexture;
         private Texture2D _pillTex;
@@ -33,6 +34,7 @@ namespace pacman
         private Player _pacman;
         private Pill _tempPill;
         private Ghost _ghost;
+        private Ghost _tempGhost;
         private Color _pillColor = Color.White;
         private Color _bigPillColor = Color.White;
         private Vector2 _scorePos = new Vector2 (25, 5);
@@ -146,11 +148,22 @@ namespace pacman
             }
 
             _ghostTex = Content.Load<Texture2D>("Ghost");
-            Point GhostStart = FindRandomTile();
+            Point GhostStart;
 
-            _ghost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), Color.White);
-            _ghost.PlaceGhostOnGrid(GhostStart, _tileSizeX, _tileSizeY, _tileArray);
+            //_ghost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), Color.White);
+            //_ghost.PlaceGhostOnGrid(GhostStart, _tileSizeX, _tileSizeY, _tileArray);
+
+            //iterate through ghost list to create 4 ghosts 
+
+            for (int i = 0; i < 4; i++)
+            {
+                GhostStart = FindRandomTile();
+                _tempGhost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), Color.White);
+                _allGhosts.Add(_tempGhost);
+                _tempGhost.PlaceGhostOnGrid(GhostStart, _tileSizeX, _tileSizeY, _tileArray);
+            }
         }
+
 
         private Tile[,] RenewTileMap(Tile[,] tileMap)
         {
@@ -170,14 +183,37 @@ namespace pacman
             //make ghost movement update every 10 frames to prevent spamming
             if (_timer == 10)
             {
-                _ghost.Update(gameTime, _tileArray);
+                //_ghost.Update(gameTime, _tileArray);
+                //iterate through ghost list to update each ghost
+                foreach (Ghost Y in _allGhosts)
+                {
+                    Y.Update(gameTime, _tileArray);
+                }
                 _timer = 0;
             }
 
             //check ghost collision with the player
-            if (_ghost.BoundingBox.Intersects(_pacman.BoundingBox))
+            //if (_ghost.BoundingBox.Intersects(_pacman.BoundingBox))
+            //{
+            //    _endGame = true;
+            //}
+
+            //iterate through ghost list to check collision + check if player is powered or not
+            foreach (Ghost g in _allGhosts)
             {
-                _endGame = true;
+                if (_pacman.BoundingBox.Intersects(g.BoundingBox))
+                {
+                    if (_powered == false)
+                    {
+                        //kill player
+                        _endGame = true;
+                    }
+                    else
+                    {
+                        //kill ghost
+                        _endGame = false;
+                    }
+                }
             }
 
             //check collision between each pill and the player
@@ -251,7 +287,13 @@ namespace pacman
                 _pacman.Draw(_spriteBatch);
 
                 //draw ghost
-                _ghost.Draw(_spriteBatch);
+                //_ghost.Draw(_spriteBatch);
+
+                //draw each ghost
+                foreach (Ghost testGhost in _allGhosts)
+                {
+                    testGhost.Draw(_spriteBatch);
+                }
 
                 //draw score last so it's above everything
                 _spriteBatch.DrawString(_scoreFont, _scoreString, _scorePos, Color.Red);
