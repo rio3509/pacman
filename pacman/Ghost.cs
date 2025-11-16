@@ -66,6 +66,13 @@ namespace pacman
             set { _ghostPos = value; }
         }
 
+        //colour property
+        public override Color Color
+        {
+            get { return _ghostColor; }
+            set { _ghostColor = value; }
+        }
+
         //homing function - set ghost on a given point on the grid
         public void PlaceGhostOnGrid(Point grid, int tileWidth, int tileHeight, Tile[,] tiles)
         {

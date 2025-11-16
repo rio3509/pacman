@@ -44,7 +44,7 @@ namespace pacman
             set { _spritePos = value; } 
         }
 
-        public Microsoft.Xna.Framework.Color Color
+        public virtual Microsoft.Xna.Framework.Color Color
         {
             get { return _spriteCol; }
             set { _spriteCol = value; }

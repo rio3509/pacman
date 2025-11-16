@@ -263,6 +263,11 @@ namespace pacman
                         _score += 10;
                         _powered = true;
                         _powerTimer = 600;
+                        //iterate through every ghost and make them blue (scared)
+                        foreach (Ghost W in _allGhosts)
+                        {
+                            W.Color = Color.LightBlue;
+                        }
                     }
                 }
             }
