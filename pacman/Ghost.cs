@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -19,6 +20,7 @@ namespace pacman
         private Point _grid;
         private int _tileWidth;
         private int _tileHeight;
+        private bool _ghostVisible = true;
 
         //constructor
         public Ghost()
@@ -37,7 +39,10 @@ namespace pacman
         //draw function
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_ghostTex, _ghostPos, _ghostColor);
+            if (_ghostVisible)
+            {
+                spriteBatch.Draw(_ghostTex, _ghostPos, _ghostColor);
+            }
         }
 
         //bounding box property for collision
@@ -45,6 +50,20 @@ namespace pacman
         {
             get { return _ghostBox; }
             set { _ghostBox = value; }
+        }
+
+        //visibility property
+        public bool Visible
+        {
+            get { return _ghostVisible; }
+            set { _ghostVisible = value; }
+        }
+
+        //position property for spawn resetting
+        public override Vector2 Position
+        {
+            get { return _ghostPos; }
+            set { _ghostPos = value; }
         }
 
         //homing function - set ghost on a given point on the grid
@@ -65,6 +84,8 @@ namespace pacman
         //movement method
         public void Update(GameTime gameTime, Tile[,] tiles)
         {
+            //update grid to prevent teleportation
+            _grid = new Point ((int)(_ghostPos.X / _tileWidth), (int)(_ghostPos.Y / _tileHeight));
 
             Point delta = Point.Zero;
             Random rand = new Random();
@@ -122,7 +143,7 @@ namespace pacman
             {
                 return "true";
             }
-            else if (tiles[target.Y, target.X].Type == "Pill_L")
+            else if (tiles[target.Y, target.X].Type == "Pill_L" || tiles[target.Y, target.X].Type == "Spawn")
             {
                 _privateTiles[target.Y, target.X].Type = "Empty";
                 return "true";

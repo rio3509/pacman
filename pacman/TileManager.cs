@@ -128,6 +128,10 @@ namespace pacman
                             //draw an empty tile but set the type to "Pill_L"
                             tileArray[y, x] = new Tile(textures[8], tilePosition, tileColour, "Pill_L");
                             break;
+                        case 'G':
+                            //draw an empty tile but set the type to "Spawn"
+                            tileArray[y, x] = new Tile(textures[8], tilePosition, tileColour, "Spawn");
+                            break;
                         default:
                             // Fallback to a safe default to avoid nulls if the map contains unexpected chars or missing data
                             tileArray[y, x] = new Tile(textures[9], tilePosition, tileColour, "Solid");

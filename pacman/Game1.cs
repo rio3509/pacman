@@ -39,6 +39,7 @@ namespace pacman
         private Color _bigPillColor = Color.White;
         private Color _ghostColor = Color.Red;
         private Vector2 _scorePos = new Vector2 (25, 5);
+        private Vector2 _ghostSpawn;
 
         private bool _powered = false;
         private bool _endGame = false;
@@ -61,6 +62,21 @@ namespace pacman
                 }
             }
             return new Point(0, 0);
+        }
+
+        private Point FindFirstSpawnTile()
+        {
+            for (int y = 0; y < _tileArray.GetLength(0); y++)
+            {
+                for (int x = 0; x < _tileArray.GetLength(1); x++)
+                {
+                    if (_tileArray[y, x].Type == "Spawn")
+                    {
+                        return new Point(x, y);
+                    }
+                }
+            }
+            return new Point(6, 13);
         }
 
         private Point FindRandomTile()
@@ -93,7 +109,6 @@ namespace pacman
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
 
             base.Initialize();
         }
@@ -151,15 +166,16 @@ namespace pacman
             _ghostTex = Content.Load<Texture2D>("Ghost");
             Point GhostStart;
 
-            //_ghost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), Color.White);
-            //_ghost.PlaceGhostOnGrid(GhostStart, _tileSizeX, _tileSizeY, _tileArray);
+            //define a spawn point for ghosts to revert to when they die
+            Point Spawn = FindFirstSpawnTile();
+            _ghostSpawn = new Vector2((Spawn.X * _tileSizeX), (Spawn.Y * _tileSizeY));
 
             //iterate through ghost list to create 4 ghosts 
 
             for (int i = 0; i < 4; i++)
             {
                 GhostStart = FindRandomTile();
-                _tempGhost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), Color.White);
+                _tempGhost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), _ghostColor);
                 _allGhosts.Add(_tempGhost);
                 _tempGhost.PlaceGhostOnGrid(GhostStart, _tileSizeX, _tileSizeY, _tileArray);
             }
@@ -180,6 +196,8 @@ namespace pacman
             _timer += 1;
             _pacman.Update(gameTime, _tileArray);
 
+            //testing purposes
+            //_powered = true;
 
             //make ghost movement update every 10 frames to prevent spamming
             if (_timer == 10)
@@ -211,7 +229,9 @@ namespace pacman
                     }
                     else
                     {
-                        //kill ghost
+                        //kill ghost (set its position to be back in the spawn box and update score)
+                        g.Position = (_ghostSpawn);
+                        //g.Visible = false;
                         _endGame = false;
                     }
                 }
@@ -242,12 +262,30 @@ namespace pacman
                         bigtest.Visible = false;
                         _score += 10;
                         _powered = true;
+                        _powerTimer = 600;
                     }
                 }
             }
+            
 
-            //update score string
-            _scoreString = "Score: " + _score + "pts";
+            //create and decrement power timer
+            if ((_powerTimer - 1) == 0)
+            {
+                _powerTimer = 0;
+                _powered = false;
+            }
+            else if (_powerTimer > 0)
+            {
+                _powerTimer -= 1;
+            }
+            else
+            {
+                //failsafe if power timer ever gets below 0
+                _powerTimer = 0;
+            }
+
+                //update score string
+                _scoreString = "Score: " + _score + "pts";
 
             //if _endGame is false, continue to use base.Update() (otherwise stop updating to stop score from increasing)
             if (_endGame == false)

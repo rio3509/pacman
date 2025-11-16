@@ -38,7 +38,7 @@ namespace pacman
             set { _spriteTex = value; }
         }
 
-        public Microsoft.Xna.Framework.Vector2 Position
+        public virtual Microsoft.Xna.Framework.Vector2 Position
         { 
             get { return _spritePos; }
             set { _spritePos = value; } 
