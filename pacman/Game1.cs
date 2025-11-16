@@ -44,8 +44,10 @@ namespace pacman
         private bool _powered = false;
         private bool _endGame = false;
         private int _powerTimer = 0;
+        private int _deathCooldown = 0;
         private int _timer = 0;
         private int _score = 0;
+        private int _lives = 3;
         private string _scoreString;
 
         //iterate through tile array to find the first empty tile
@@ -199,6 +201,12 @@ namespace pacman
             //testing purposes
             //_powered = true;
 
+            //decrease death cool down by 1 every frame
+            if (_deathCooldown > 0)
+            {
+                _deathCooldown -= 1;
+            }
+
             //make ghost movement update every 10 frames to prevent spamming
             if (_timer == 10)
             {
@@ -220,17 +228,22 @@ namespace pacman
             //iterate through ghost list to check collision + check if player is powered or not
             foreach (Ghost g in _allGhosts)
             {
-                if (_pacman.BoundingBox.Intersects(g.BoundingBox))
+                //check if collided and death cooldown is over
+                if (_pacman.BoundingBox.Intersects(g.BoundingBox) && _deathCooldown == 0)
                 {
                     if (_powered == false)
                     {
-                        //kill player
-                        _endGame = true;
+                        //kill player - remove 1 life
+                        _lives -= 1;
+                        //give 1 second of invulnerability to prevent instadeath
+                        _deathCooldown = 60;
+                        //_endGame = true;
                     }
                     else
                     {
                         //kill ghost (set its position to be back in the spawn box and update score)
                         g.Position = (_ghostSpawn);
+                        _score += 100;
                         //g.Visible = false;
                         _endGame = false;
                     }
@@ -291,6 +304,12 @@ namespace pacman
 
                 //update score string
                 _scoreString = "Score: " + _score + "pts";
+
+            //check if lives = 0
+            if (_lives == 0)
+            {
+                _endGame = true;
+            }
 
             //if _endGame is false, continue to use base.Update() (otherwise stop updating to stop score from increasing)
             if (_endGame == false)
