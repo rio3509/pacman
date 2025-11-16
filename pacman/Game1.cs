@@ -37,7 +37,7 @@ namespace pacman
         private Ghost _tempGhost;
         private Color _pillColor = Color.White;
         private Color _bigPillColor = Color.White;
-        private Color _ghostColor = Color.Red;
+        private Color _ghostColor = Color.PaleVioletRed;
         private Vector2 _scorePos = new Vector2 (25, 5);
         private Vector2 _ghostSpawn;
 
