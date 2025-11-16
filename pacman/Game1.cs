@@ -35,6 +35,7 @@ namespace pacman
         private Ghost _ghost;
         private Color _pillColor = Color.White;
         private Color _bigPillColor = Color.White;
+        private Color _ghostColor = Color.Red;
         private Vector2 _scorePos = new Vector2 (25, 5);
 
         private bool _powered = false;
@@ -148,7 +149,7 @@ namespace pacman
             _ghostTex = Content.Load<Texture2D>("Ghost");
             Point GhostStart = FindRandomTile();
 
-            _ghost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), Color.White);
+            _ghost = new Ghost(_ghostTex, new Vector2(GhostStart.X * _tileSizeX, GhostStart.Y * _tileSizeY), _ghostColor);
             _ghost.PlaceGhostOnGrid(GhostStart, _tileSizeX, _tileSizeY, _tileArray);
         }
 
