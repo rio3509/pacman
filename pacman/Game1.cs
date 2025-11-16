@@ -45,6 +45,7 @@ namespace pacman
         private bool _endGame = false;
         private int _powerTimer = 0;
         private int _deathCooldown = 0;
+        private int _ghostCooldown = 0;
         private int _timer = 0;
         private int _score = 0;
         private int _lives = 3;
@@ -207,6 +208,12 @@ namespace pacman
                 _deathCooldown -= 1;
             }
 
+            //repeat for ghosts too
+            if (_ghostCooldown > 0)
+            {
+                _ghostCooldown -= 1;
+            }
+
             //make ghost movement update every 10 frames to prevent spamming
             if (_timer == 10)
             {
@@ -239,12 +246,13 @@ namespace pacman
                         _deathCooldown = 60;
                         //_endGame = true;
                     }
-                    else
+                    else if (_ghostCooldown == 0)
                     {
                         //kill ghost (set its position to be back in the spawn box and update score)
                         g.Position = (_ghostSpawn);
                         _score += 100;
-                        //g.Visible = false;
+                        //check if the ghost has not been killed before to prevent scoring multiple times
+                        _ghostCooldown = 60;
                         _endGame = false;
                     }
                 }
